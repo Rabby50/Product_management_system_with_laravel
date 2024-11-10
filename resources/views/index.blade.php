@@ -21,16 +21,13 @@
               <button class="btn btn-primary">Add Product</button>
             </a>
           </li>
-          <li class="nav-link px-2 link-body-emphasis">
-              {{-- <input type="search" class="form-control" placeholder="Search by Product ID" aria-label="Search" { request('product_id') }}"> --}}
-          </li>
-          {{-- shorting drop down start --}}
+          {{-- searching and shorting drop down start --}}
           <li class="nav-link px-2 link-body-emphasis">
             <form method="GET" action="{{ route('products') }}" class="mb-3">
               <div class="row">
                   <div class="col-md-4">
-                    <input type="text" class="form-control" name="product_id" id="product_id" 
-                          value="{{ request('product_id') }}" placeholder="Enter Product ID" />
+                    <input type="text" class="form-control" name="product_id" id="product_id" placeholder="Enter Product ID" />
+                    <button type="submit" class="btn btn-primary mt-3">Search</button>
                   </div>
                   
                   <div class="col-lg-4">
@@ -68,7 +65,7 @@
         <th scope="col">ID</th>
         <th scope="col">Name</th>
         <th scope="col">Price</th>
-        <th scope="col">Created Date</th>
+        <th scope="col">Stock</th>
         <th scope="col">Updated Date</th>
         <th scope="col">Operations</th>
 
@@ -77,7 +74,8 @@
       <tbody>
         @foreach($products as $value)
       <tr>
-        <td><a href="">{{$value->image}}</a></td>
+        <td><img src="{{ asset($value->image) }}" alt="Product Image" style="width: 50px; height: 50px;"></td>
+        {{-- <td><a href=""><img src="" alt="">{{$value->image}}</a></td> --}}
         <td>{{$value->product_id}}</</td>
         <td>{{$value->name}}</</td>
         <td>{{$value->price}}</</td>
@@ -91,7 +89,9 @@
             <button class="btn btn-primary rounded-pill px-3" onclick="return confirm('Are you sure?')" type="button">Edit</button>
           </a>
 
-          <a href=""><button class="btn btn-success rounded-pill px-3" type="button">View</button></a>
+          <a href="{{route('product.single', ['id'=> $value->id])}}">
+            <button class="btn btn-success rounded-pill px-3" type="button">View</button>
+          </a>
 
           <a href='{{route('product.delete', ['id'=> $value->id])}}'> 
             <button class="btn btn-danger rounded-pill px-3" onclick="return confirm('Are you sure?')" type="button">Delete</button>
