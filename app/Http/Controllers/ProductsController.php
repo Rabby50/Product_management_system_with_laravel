@@ -9,11 +9,19 @@ class ProductsController extends Controller
 {
     public function index(Request $request) 
     {
-        $sortBy = $request->input('sort', 'name');  // Default sorting by 'name'
-        $sortOrder = $request->input('order', 'asc');  // Default sorting order 'ascending'
-        $productId = $request->input('product_id');  // Get product ID from the request
-
         $query = Product::query();
+
+            // Apply search filter if requested
+            if ($request->has('search')) {
+                $query->where('product_id', 'like', '%' . $request->search . '%')
+                    ->orWhere('description', 'like', '%' . $request->search . '%');
+            }
+
+        $sortBy = $request->input('sort', 'name'); 
+        $sortOrder = $request->input('order', 'asc');  
+        $productId = $request->input('product_id'); 
+
+        // $query = Product::query();
         
         // Filter by product ID if provided
         if ($productId) {
@@ -47,11 +55,10 @@ class ProductsController extends Controller
     if ($request->has('image')) {
         $image = $request->file('image');
         $imageName = time() . '.' . $image->getClientOriginalExtension();
-        $imagePath = $image->storeAs('images', $imageName, 'public');
+        $image->move(public_path('images'), $imageName);
+        $imagePath = 'images/' . $imageName; 
     }
 
-    // Redirect or return response
-    // return redirect()->back()->with('success', 'Product created successfully.');
     try {
         Product::create([
             'product_id' => $request->product_id,
@@ -73,12 +80,13 @@ class ProductsController extends Controller
     }
     public function update(Request $request, $id)
 {
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'price' => 'required|numeric',
-        'description' => 'nullable|string',
-        'stock' => 'nullable|integer',
-    ]);
+        $request->validate([
+            'product_id' => 'nullable|string',
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric',
+            'description' => 'nullable|string',
+            'stock' => 'nullable|integer',
+        ]);
 
     $product = Product::findOrFail($id);
     $product->update([
@@ -92,26 +100,16 @@ class ProductsController extends Controller
 }
 
 
-    public function view(Request $request){
-
-        return view('show');
+    public function view($id){
+        $product = Product::findOrFail($id);
+        return view('show', compact('product'));
     }
     public function delete($id){
-        $product = Product::findOrFail($id); // Find the product by ID or throw a 404 error
-        $product->delete(); // Delete the product
+        $product = Product::findOrFail($id); 
+        $product->delete(); 
 
         return redirect()->route('products');
     }
-
-    // public function test(Request $request){
-    //     return view('test');
-    // }
-
-
-
-
-
-
 
 
 }
